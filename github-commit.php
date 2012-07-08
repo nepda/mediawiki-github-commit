@@ -64,5 +64,7 @@ function efGitHubCommitRender( $input, $args, $parser )
 
 		$data = json_decode($json);
 
+		echo '<pre>';
         var_dump($data);
+        echo '</pre>';
 }
