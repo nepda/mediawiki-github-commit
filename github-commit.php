@@ -37,7 +37,7 @@ function efGitHubCommitRender($input, $args, $parser)
 {
     $attr = array();
     $offset = 0;
-    $count = 1
+    $count = 1;
 
     $user = 'nepda';
     $repo = 'mediawiki-github-commit';
