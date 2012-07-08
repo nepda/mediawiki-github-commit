@@ -30,20 +30,21 @@ function efGitHubCommit() {
 
 function efGitHubCommitRender( $input, $args, $parser )
 {
-        $attr = array();
-        $offset = 0;
-        $count = 1;
+    $attr = array();
+    $offset = 0;
+    $count = 1
 
-        $user = 'nepda';
-        $repo = 'mediawiki-github-commit';
+    $user = 'nepda';
+    $repo = 'mediawiki-github-commit';
+    $date_format = "d.m.Y H:i";
 
-        // This time, make a list of attributes and their values,
-        // and dump them, along with the user input
-		foreach( $args as $name => $value )
-		{
-			switch($name)
-			{
-				case 'offset':
+    $str = "";
+
+    foreach( $args as $name => $value )
+    {
+	switch($name)
+	{
+    case 'offset':
 					$offset = (int)$value;
 					break;
 				case 'count':
@@ -55,8 +56,17 @@ function efGitHubCommitRender( $input, $args, $parser )
 				case 'repo':
 					$repo = $value;
 					break;
+				case 'dateformat':
+					$date_format = $value;
+					break;
 			}
         }
+
+
+    $tpl_before = "<ul>";
+    $tpl = "<li><code>%commit_committer_date%:</code> %commit_message% <small>by %commit_committer_name%</small> <a href=\"https://github.com/$user/$repo/tree/%commit_sha%\">Tree zeigen</a></li>";
+    $tpl_after = "</ul>";
+    
 
 		$cfg_api_url = 'https://api.github.com/repos/'.$user.'/'.$repo.'/commits';
 
@@ -65,14 +75,31 @@ function efGitHubCommitRender( $input, $args, $parser )
 		$data = json_decode($json);
 
 
-		$str = "";
+		$str .= $tpl_before;
+		for($i = $offset; $i <= $count; $i++)
+		{
+		    if (empty($data[$i]))
+			continue;
+		    $commit = array(
+			'%commit_url%' => $data[$i]->commit->url,
+			'%commit_committer_email%' => $data[$i]->commit->committer->email,
+			'%commit_committer_date%' => date($date_format, strtotime($data[$i]->commit->committer->date)),
+			'%commit_committer_name%' => $data[$i]->commit->committer->name,
+			'%commit_message%' => $data[$i]->commit->message,
+			'%commit_tree_url%' => $data[$i]->commit->tree->url,
+			'%commit_tree_sha%' => $data[$i]->commit->tree->sha,
+			'%commit_sha%' => $data[$i]->commit->sha,
+			'%commit_author_email%' => $data[$i]->commit->author->email,
+			'%commit_author_date%' => date($date_format, strtotime($data[$i]->commit->author->date)),
+			'%commit_author_name%' => $data[$i]->commit->author->name,
+		    );
 
-		$str .= "commiter: "  . $data[0]->commit->commiter->name;
+		    $tmp_tpl = str_replace(array_keys($commit), array_values($commit), $tpl);
+		    
+		    $str .= $tmp_tpl;
+		}
+		$str .= $tpl_after;
 
-
-		echo '<pre>';
-        var_dump($data);
-        echo '</pre>';
 
         return $str;
 }
