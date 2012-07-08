@@ -64,7 +64,15 @@ function efGitHubCommitRender( $input, $args, $parser )
 
 		$data = json_decode($json);
 
+
+		$str = "";
+
+		$str .= "commiter: "  . $data[0]->commit->commiter->name;
+
+
 		echo '<pre>';
         var_dump($data);
         echo '</pre>';
+
+        return $str;
 }
